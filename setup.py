@@ -100,6 +100,42 @@ class my_clean(clean):
             remove_tree(self.build_helper, dry_run=self.dry_run)
         clean.run(self)
 
+class my_example_py2(install):
+    def initialize_options(self):
+        install.initialize_options(self)
+        self.plat_name = None
+        self.build_base = None
+
+    def finalize_options(self):
+        self.set_undefined_options('build',
+                ('build_base', 'build_base'),
+                ('plat_name', 'plat_name'),
+        )
+
+    def run(self):
+        self.run_command('build')
+
+        dstpath = os.path.join(self.build_base, 'example')
+        if not os.path.exists(dstpath):
+            os.mkdir(dstpath)
+
+        plat_specifier = '.%s-%s' % (self.plat_name, sys.version[0:3])
+        self.copy_file(infile=os.path.join(self.build_base,
+                                           'helper' + plat_specifier,
+                                           'rawsocket-helper'),
+                       outfile=dstpath)
+        self.copy_file(infile=os.path.join(self.build_base,
+                                           'lib' + plat_specifier,
+                                           'rawsocket.so'),
+                       outfile=dstpath)
+
+        with open(os.path.join(dstpath, 'example2.py'), 'w') as f:
+            f.write('import socket\n')
+            f.write('import rawsocket\n')
+            f.write('fd = rawsocket.rawsocket_fd()\n')
+        print('You have to set NET_RAW capability to rawsocket-helper:')
+        print('# setcap cap_net_raw+ep example/rawsocket-helper')
+
 setup(name = name,
         version = version,
         description = 'Raw packet socket for Linux',
@@ -124,5 +160,6 @@ setup(name = name,
             'clean': my_clean,
             'install': my_install,
             'build_helper': run_build_helper,
+            'example_py2': my_example_py2,
         },
 )
