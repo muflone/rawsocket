@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
 
 int send_socket(int fd, int sfd)
 {
@@ -53,25 +54,33 @@ int main(int argc, char **argv)
 	int ret = EXIT_FAILURE;
 
 	/* argument parsing */
+    printf("Arguments: %d\n", argc);
 	if (argc != 4)
+	{
 		goto out;
-	
+    }
 	protocol = strtol(argv[3], &endp, 10);
-	if (*argv[3] && *endp)
-		goto out;
 
 	family = strtol(argv[2], &endp, 10);
-	if (*argv[2] && *endp)
-		goto out;
+    printf("  Arg #0: %s\n", argv[0]);
+    printf("  Arg #1: %s\n", argv[1]);
+    if (*argv[2] && *endp) {
+        goto out;
+    }
+    printf("  Arg #2: %s\n", argv[2]);
 
 	fd = strtol(argv[1], &endp, 10);
-	if (*argv[1] && *endp)
+	if (*argv[1] && *endp) {
+	    printf("there was some error, endp\n");
 		goto out;
+    }
 
 	/* open raw socket */
 	raw_fd = socket(family, SOCK_RAW, protocol);
-	if (raw_fd == -1)
+	if (raw_fd == -1) {
+	    printf("there was some error, raw_fd == -1\n");
 		goto out;
+    }
 
 	rc = send_socket(fd, raw_fd);
 	if (rc == -1) {
@@ -80,6 +89,7 @@ int main(int argc, char **argv)
 	}
 
 	ret = EXIT_SUCCESS;
+    printf("Operation successfull\n");
 
 out:
 	close(fd);
