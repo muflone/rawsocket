@@ -16,6 +16,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include "rawsocket.h"
+
 int send_socket(int fd, int sfd)
 {
 	int rc;
@@ -54,7 +56,9 @@ int main(int argc, char **argv)
 	int ret = EXIT_FAILURE;
 
 	/* argument parsing */
-    printf("Arguments: %d\n", argc);
+    if (SHOW_VERBOSE) {
+        printf("Arguments: %d\n", argc);
+    }
 	if (argc != 4)
 	{
 		goto out;
@@ -62,12 +66,16 @@ int main(int argc, char **argv)
 	protocol = strtol(argv[3], &endp, 10);
 
 	family = strtol(argv[2], &endp, 10);
-    printf("  Arg #0: %s\n", argv[0]);
-    printf("  Arg #1: %s\n", argv[1]);
+	if (SHOW_VERBOSE) {
+        printf("  Arg #0: %s\n", argv[0]);
+        printf("  Arg #1: %s\n", argv[1]);
+    }
     if (*argv[2] && *endp) {
         goto out;
     }
-    printf("  Arg #2: %s\n", argv[2]);
+    if (SHOW_VERBOSE) {
+        printf("  Arg #2: %s\n", argv[2]);
+    }
 
 	fd = strtol(argv[1], &endp, 10);
 	if (*argv[1] && *endp) {
@@ -89,7 +97,9 @@ int main(int argc, char **argv)
 	}
 
 	ret = EXIT_SUCCESS;
-    printf("Operation successfull\n");
+    if (SHOW_VERBOSE) {
+        printf("Operation successfull\n");
+    }
 
 out:
 	close(fd);

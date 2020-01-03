@@ -11,6 +11,8 @@
 #include <sys/wait.h>
 #include <net/ethernet.h>
 
+#include "rawsocket.h"
+
 #define RAW_SOCK_HELPER "rawsocket-helper"
 
 static int spawn_helper(int fd, int family, int protocol)
@@ -45,11 +47,13 @@ static int spawn_helper(int fd, int family, int protocol)
 		snprintf(fd_str, sizeof(fd_str), "%d", fd);
 		snprintf(family_str, sizeof(family_str), "%d", family);
 		snprintf(protocol_str, sizeof(protocol_str), "%d", protocol);
-		printf("Executing\n");
-		printf("from: %s\n", envp[0]);
-		for (int i = 0; i < 2; i++) {
-			printf("  Arg #%d: %s\n", i, argv[i]);
-		}
+		if (SHOW_VERBOSE) {
+		    printf("Executing\n");
+		    printf("from: %s\n", envp[0]);
+		    for (int i = 0; i < 2; i++) {
+    			printf("  Arg #%d: %s\n", i, argv[i]);
+    		}
+        }
 		execvpe(argv[0], argv, envp);
 		exit(1);
 	}
